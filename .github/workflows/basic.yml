@@ -108,6 +108,13 @@ jobs:
             echo "Cache-hit value (true => match on key, false => found restore-key match, empty => cache miss): '${{ steps.load_hash_cache.outputs.cache-hit }}'" >> $GITHUB_STEP_SUMMARY
             python ./scripts/calculate_hashes.py
 
+      - name: Upload hash debug logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: hash-debug
+          path: |
+             .hash-debug/*
+
       # TODO - check out ncc or similar to avoid npm install step: https://docs.github.com/en/actions/sharing-automations/creating-actions/creating-a-javascript-action#commit-tag-and-push-your-action
       - name: Check for artifacts - npm install
         run: |

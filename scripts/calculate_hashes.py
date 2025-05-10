@@ -97,23 +97,35 @@ class Filter:
         NOTE: to get a stable fingerprint, ensure a consistent order of files
         """
 
-        # iterate the files in the file_list and calculate the sha1 hash
-        hash = hashlib.sha1()
+        os.makedirs(".hash-debug", exist_ok=True)
+        with open(os.path.join(".hash-debug", f"{self.name}.txt"), "w") as debug_file:
 
-        for file in files:
-            for path_filter in self.files:
-                if path_filter.regex.match(file):
-                    # print(f"Adding {file} to hash", flush=True)
-                    # Add the filename to the hash
-                    hash.update(file.encode("utf-8"))
+            print(f"::group::Filter - {self.name}", flush=True) 
 
-                    with open(file, "rb") as f:
-                        # Read the file in chunks to handle large files
-                        for chunk in iter(lambda: f.read(4096), b""):
-                            hash.update(chunk)
-                    break
 
-        return hash.hexdigest()
+            # iterate the files in the file_list and calculate the sha1 hash
+            hash = hashlib.sha1()
+
+            for file in files:
+                for path_filter in self.files:
+                    if path_filter.regex.match(file):
+                        # print(f"Adding {file} to hash", flush=True)
+                        # Add the filename to the hash
+                        hash.update(file.encode("utf-8"))
+                        debug_file.write(f"{file}\n")
+                        print(file=file, flush=True)
+
+                        with open(file, "rb") as f:
+                            # Read the file in chunks to handle large files
+                            for chunk in iter(lambda: f.read(4096), b""):
+                                hash.update(chunk)
+                        break
+
+            hash_result = hash.hexdigest()
+            debug_file.write(f"\nHash: {hash_result}\n")
+            print("::endgroup::", flush=True)
+            print(f"Hash (${self.name}): {hash_result}", flush=True)
+            return hash_result
 
 
 def load_filter_file(filter_file: str) -> list[Filter]:
