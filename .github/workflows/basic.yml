@@ -29,6 +29,10 @@ jobs:
         run: |
           echo '${{ toJson(github)}}'
 
+      - name: Show job info
+        run: |
+          echo '${{ toJson(job)}}'
+
       - name: Show env vars
         run: |
           printenv | sort
