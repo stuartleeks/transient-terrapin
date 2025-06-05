@@ -16,12 +16,13 @@ permissions:
 
 jobs:
   name-test:
+    if: ${{ github.job == 'name-test' }}
     runs-on: ubuntu-latest
 
     steps:
       - name: Show job name
         run: echo '${{ github.job }}'
-        
+
   calculate:
     runs-on: ubuntu-latest
     outputs:
