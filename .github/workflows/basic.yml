@@ -15,6 +15,13 @@ permissions:
   id-token: write # need this for federated login
 
 jobs:
+  name-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Show job name
+        run: echo '${{ github.job }}'
+        
   calculate:
     runs-on: ubuntu-latest
     outputs:
@@ -36,6 +43,7 @@ jobs:
       - name: Show job name
         run: |
           echo '${{ vars.JOB_NAME }}'
+          echo '${{ github.job }}'
 
       - name: Show vars
         run: |
