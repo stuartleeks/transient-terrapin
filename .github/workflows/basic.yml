@@ -15,6 +15,14 @@ permissions:
   id-token: write # need this for federated login
 
 jobs:
+  name-test:
+    if: ${{ github.job == 'name-test' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Show job name
+        run: echo '${{ github.job }}'
+
   calculate:
     runs-on: ubuntu-latest
     outputs:
@@ -28,6 +36,19 @@ jobs:
       - name: Show event info
         run: |
           echo '${{ toJson(github)}}'
+
+      - name: Show job info
+        run: |
+          echo '${{ toJson(job)}}'
+
+      - name: Show job name
+        run: |
+          echo '${{ vars.JOB_NAME }}'
+          echo '${{ github.job }}'
+
+      - name: Show vars
+        run: |
+          echo '${{ toJson(vars) }}'
 
       - name: Show env vars
         run: |
@@ -125,9 +146,9 @@ jobs:
   build-common:
     runs-on: ubuntu-latest
     needs: calculate
-    if:  ${{ !failure() && !fromJson(needs.calculate.outputs.jobs).build-common.artifact_exists }}
+    if:  ${{ !failure() && !fromJson(needs.calculate.outputs.jobs)[github.job].artifact_exists }}
     env:
-      KEY_COMMON_BUILD: ${{ fromJson(needs.calculate.outputs.jobs).build-common.artifact_key }}
+      KEY_COMMON_BUILD: ${{ fromJson(needs.calculate.outputs.jobs)[github.job].artifact_key }}
     steps:
       - uses: actions/checkout@v4
 
@@ -163,9 +184,9 @@ jobs:
     needs:
       - calculate
       - build-common
-    if:  ${{ (!failure() && !fromJson(needs.calculate.outputs.jobs).build.artifact_exists) || needs.build-common.result == 'success' }}
+    if:  ${{ (!failure() && !fromJson(needs.calculate.outputs.jobs)[github.job].artifact_exists) || needs.build-common.result == 'success' }}
     env:
-      KEY_BUILD: ${{ fromJson(needs.calculate.outputs.jobs).build.artifact_key }}
+      KEY_BUILD: ${{ fromJson(needs.calculate.outputs.jobs)[github.job].artifact_key }}
     steps:
       - uses: actions/checkout@v4
 
@@ -212,9 +233,9 @@ jobs:
     needs:
       - calculate
       - build-common
-    if:  ${{ (!failure() && !fromJson(needs.calculate.outputs.jobs).test-common.artifact_exists) || needs.build-common.result == 'success' }}
+    if:  ${{ (!failure() && !fromJson(needs.calculate.outputs.jobs)[github.job].artifact_exists) || needs.build-common.result == 'success' }}
     env:
-      KEY_COMMON_TEST: ${{ fromJson(needs.calculate.outputs.jobs).test-common.artifact_key }}
+      KEY_COMMON_TEST: ${{ fromJson(needs.calculate.outputs.jobs)[github.job].artifact_key }}
     steps:
       - uses: actions/checkout@v4
 
@@ -266,9 +287,9 @@ jobs:
     needs:
       - calculate
       - build
-    if:  ${{ (!failure() && !fromJson(needs.calculate.outputs.jobs).test.artifact_exists) || needs.build.result == 'success' }}
+    if:  ${{ (!failure() && !fromJson(needs.calculate.outputs.jobs)[github.job].artifact_exists) || needs.build.result == 'success' }}
     env:
-      KEY_COMMON_TEST: ${{ fromJson(needs.calculate.outputs.jobs).test.artifact_key }}
+      KEY_COMMON_TEST: ${{ fromJson(needs.calculate.outputs.jobs)[github.job].artifact_key }}
     steps:
       - uses: actions/checkout@v4
 
