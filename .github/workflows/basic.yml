@@ -33,6 +33,14 @@ jobs:
         run: |
           echo '${{ toJson(job)}}'
 
+      - name: Show job name
+        run: |
+          echo '${{ vars.JOB_NAME }}'
+
+      - name: Show vars
+        run: |
+          echo '${{ toJson(vars) }}'
+
       - name: Show env vars
         run: |
           printenv | sort
